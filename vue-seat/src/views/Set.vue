@@ -7,11 +7,14 @@
             <div class="left">
                 <h3>座位图</h3>
                 <div class="seat">
-                    <div v-for="(itemRow, indexRow) in seatList" v-bind:key="itemRow+'-row'">
-                        <div v-for="(itemCol, indexCol) in itemRow" class="seat-one" v-bind:key="itemCol+'-col'">
-                             <seat></seat>
+                    <div class="seat-container">
+                         <div class="seat-row" v-for="(itemRow, indexRow) in seatList" v-bind:key="itemRow+'-row'">
+                            <div v-for="(itemCol, indexCol) in itemRow" class="seat-one" v-bind:key="itemCol+'-col'">
+                                <seat></seat>
+                            </div>
                         </div>
                     </div>
+                   
                 </div>
             </div>
             <div class="right">
@@ -109,18 +112,28 @@ export default {
         display: flex;
         .left {
             flex: 1;
+            overflow: hidden;
             .seat {
+                overflow: scroll;
                 text-align: left;
                 border: 1px solid #000;
-                height: 700px;
-                .seat-one {
-                    display: inline-block;
-                    width: 50px;
-                    height: 50px;
-                    background-color: #EEF0F4;
-                    color: #7B83A8;
-                    margin: 5px
-                }
+                height: 400px;
+                max-width:100%;
+                .seat-container {
+                    .seat-row {
+                        display: flex;
+                        flex-wrap: nowrap;
+                        .seat-one {
+                            // display: inline-block;
+                            min-width: 50px;
+                            height: 50px;
+                            background-color: #EEF0F4;
+                            color: #7B83A8;
+                            margin: 5px
+                        }
+                    }
+                    
+                }                
             }
         }
         .right {
