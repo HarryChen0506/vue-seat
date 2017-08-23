@@ -1,10 +1,10 @@
 <template>
   <div class="seat-box" 
-       v-bind:class="{null:status=='null',isSeat:status=='seat',valid: status=='valid',soldout: status=='soldout'}">
+       v-bind:class="{null:seatStatus=='null',isSeat:seatStatus=='seat',valid: ticketStatus=='valid',soldout: ticketStatus=='soldout'}">
     <!--<div class="title">{{ msg }}</div>-->
-    <section v-show="status!=='null'" >
+    <section v-show="seatStatus!=='null'" >
       <div class="title">{{rowNum}}排{{colNum}}座</div>
-      <div class="title">票面:{{originPrice.originPrice}}</div>
+      <div class="title">票面:{{originPrice.originPriceNum}}</div>
       <div>
         <span class="price-icon"  v-bind:style="{ backgroundColor: originPrice.color}" ></span>
       </div>
@@ -14,8 +14,8 @@
       <div class="detail">{{name}}</div>
       <div class="detail">排：{{rowNum}}</div>
       <div class="detail">列：{{colNum}}</div>      
-      <div class="detail">票面：{{originPrice.originPrice}}</div>      
-      <div class="detail">状态：{{status}}</div>      
+      <div class="detail">票面：{{originPrice.originPriceNum}}</div>      
+      <div class="detail">状态：{{ticketStatus}}</div>      
     </section>    
   </div>
 </template>
@@ -33,7 +33,8 @@ export default {
     'colNum',
     'name',
     'originPrice',
-    'status'
+    'seatStatus',
+    'ticketStatus'
   ]
 }
 </script>
@@ -62,6 +63,7 @@ export default {
       // overflow: hidden;
       position: relative;
       height: 100%;
+      color: #fff;
       &.null {
         opacity: 0.2;
       }
@@ -69,7 +71,7 @@ export default {
         background-color:#CADAEC
       }
       &.valid {
-        background-color: red
+        background-color: lightseagreen
       }
       &.soldout {
         background-color: gray

@@ -17,7 +17,8 @@
                                       :origin-price="itemCol.originPrice"  
                                       :row-num="itemCol.rowNum" 
                                       :col-num="itemCol.colNum"
-                                      :status="itemCol.status"></seat>
+                                      :seat-status="itemCol.seatStatus"
+                                      :ticket-status="itemCol.ticketStatus"></seat>
                             </div>
                         </div>
                     </div>                   
@@ -28,40 +29,17 @@
 
             </div>
             <div class="right">
-                <h3>行与列配置</h3>
-                <section class="row">
-                    <div class="header">行与列</div>
-                    <div class="box">
-                        <input class="f-l" type="text" placeholder="行" v-model="row">
-                        <input class="f-l" type="text" placeholder="列" v-model="col">
-                        <button class="f-l" @click="resetRowCol()">重置</button>
-                    </div>
-                </section>    
-                  <div class="seat-config">
-                     <h3>票面设置</h3>
-                     <section class="row">
-                        <div class="header">票面属性</div>
+                <div class="seat-config">
+                    <h3>行与列配置</h3>
+                    <section class="row">
+                        <div class="header">行与列</div>
                         <div class="box">
-                            <input class="f-l" type="number" placeholder="票面" v-model="seatSet.originPrice">                           
-                            <select v-model="seatSet.color">                                
-                                <option value="">请选择颜色</option>
-                                <option v-for="option in seatSet.colorList" v-bind:value="option">
-                                    {{ option }}
-                                </option>
-                            </select>  
-                            <button @click="addOriginPrice()">添加</button>                      
+                            <input class="f-l" type="text" placeholder="行" v-model="row">
+                            <input class="f-l" type="text" placeholder="列" v-model="col">
+                            <button class="f-l" @click="resetRowCol()">重置</button>
                         </div>
-                    </section>                                                      
-                    <div class="btn-group">
-                        <ul>
-                            <li v-for="item in seatSet.originPriceList">
-                                <span class="m_r_10">票面:{{item.originPrice}}</span>
-                                <span class="m_r_10">颜色:{{item.color}}</span>
-                                <button @click="removeOriginPrice(item, seatSet.originPriceList)">删除</button>
-                            </li>
-                        </ul>
-                    </div>
-                </div>           
+                    </section>  
+                </div>  
                 <div class="seat-config">
                      <h3>座位设置</h3>
                      <section class="row">
@@ -77,31 +55,79 @@
                             <span class="f-l" style="margin-right:10px">To</span>
                             <input class="f-l" type="number" placeholder="行" v-model="seatSet.seat.colNum_to">                          
                         </div>
-                    </section> 
+                    </section>  
+                    <section class="row">
+                        <div class="header">状态</div>
+                        <div class="box">
+                            <select v-model="seatSet.seat.seatStatus">
+                                <option v-for="option in seatSet.seatStatusList" v-bind:value="option.value">
+                                    {{ option.name }}
+                                </option>
+                            </select>                     
+                        </div>
+                    </section>                                   
+                    <div class="btn-group">
+                        <button @click="setSeatTable()">确定</button>
+                        <button @click="cancelSelected()">取消全选</button>
+                    </div>
+                </div>
+                <div class="seat-config">
+                     <h3>票面设置</h3>
+                     <section class="row">
+                        <div class="header">票面属性</div>
+                        <div class="box">
+                            <input class="f-l" type="number" placeholder="票面" v-model="seatSet.originPriceNum">                           
+                            <select v-model="seatSet.color">                                
+                                <option value="">请选择颜色</option>
+                                <option v-for="option in seatSet.colorList" v-bind:value="option">
+                                    {{ option }}
+                                </option>
+                            </select>  
+                            <button @click="addOriginPrice()">添加</button>                      
+                        </div>
+                    </section>                                                      
+                    <div class="btn-group">
+                        <ul>
+                            <li v-for="item in seatSet.originPriceList">
+                                <span class="m_r_10">票面:{{item.originPriceNum}}</span>
+                                <span class="m_r_10">颜色:{{item.color}}</span>
+                                <button @click="removeOriginPrice(item, seatSet.originPriceList)">删除</button>
+                            </li>
+                        </ul>
+                    </div>
                     <section class="row">
                         <div class="header">票面</div>
                         <div class="box">
                             <!--<input class="f-l" type="number" placeholder="行" v-model="seatSet.seat.originPrice">  -->
-                            <select v-model="seatSet.seat.originPrice">
+                            <select v-model="seatSet.originPrice">
                                 <option v-for="option in seatSet.originPriceList" v-bind:value="option">
-                                    {{ option.originPrice }}
+                                    {{ option.originPriceNum }}
                                 </option>
                             </select>                         
                         </div>
-                    </section> 
+                    </section>                                     
+                    <div class="btn-group">
+                        <button @click="setSeatOriginPrice()">确定</button>
+                        <button @click="cancelSelected()">取消全选</button>
+                    </div>
+
+                </div>                   
+                <div class="seat-config">
+                     <h3>售票设置</h3>
                     <section class="row">
                         <div class="header">状态</div>
                         <div class="box">
-                            <select v-model="seatSet.seat.status">
-                                <option v-for="option in seatSet.statusList" v-bind:value="option.value">
+                            <select v-model="seatSet.ticketStatus">
+                                <option v-for="option in seatSet.ticketStatusList" v-bind:value="option.value">
                                     {{ option.name }}
                                 </option>
                             </select>                     
                         </div>
                     </section>                    
                     <div class="btn-group">
-                        <pre>{{seatSet.seat}}</pre>
-                        <button @click="setSeat()">确定</button>
+                        <div style="display:block; max-height:150px; overflow:auto"><pre >{{seatSet}}</pre></div>
+                        
+                        <button @click="setSeatTicketStatus()">确定</button>
                         <button @click="cancelSelected()">取消全选</button>
                     </div>
                 </div>
@@ -131,7 +157,8 @@ export default {
                 colIndex: 0,
                 rowNum: 1,
                 colNum:1,
-                status: 'null',
+                seatStatus: 'null',
+                ticketStatus: 'none',
                 originPrice: {
                     originPrice: 0,
                     color: ''
@@ -143,14 +170,15 @@ export default {
                     name: '座位',                
                     rowNum: 1,
                     colNum_from:1,
-                    colNum_to:1,
-                    status: 'null',
-                    originPrice: {
-                        originPrice: 0,
-                        color: ''
-                    }
+                    colNum_to:1, 
+                    seatStatus: 'null',                   
+                },                
+                ticketStatus: 'none',
+                originPrice: {
+                    originPriceNum: 0,
+                    color: ''
                 },
-                statusList:[
+                seatStatusList:[
                     {
                         name: '空',
                         value: 'null',
@@ -159,19 +187,26 @@ export default {
                         name: '座位',
                         value: 'seat',
                         code: 1
+                    }
+                ],
+                ticketStatusList: [
+                    {
+                        name: '未定义',
+                        value: 'none',
+                        code: 0
                     },{
                         name: '可卖',
                         value: 'valid',
-                        code: 2
+                        code: 1
                     },{
                         name: '已卖',
                         value: 'soldout',
-                        code: 3
+                        code: 2
                     }
                 ],
                 originPriceList: [],
-                originPrice: 0,
-                colorList: ['#000','#333','#666'],
+                originPriceNum: 0,
+                colorList: ['#ff5722','#03a9f4','#8bc34a','#9c27b0'],
                 color: ''               
             },
             
@@ -215,7 +250,7 @@ export default {
         },
         addOriginPrice: function (){
             var obj = {
-                originPrice: this.seatSet.originPrice,
+                originPriceNum: this.seatSet.originPriceNum,
                 color:  this.seatSet.color
             }
             this.seatSet.originPriceList.push(obj);
@@ -236,7 +271,7 @@ export default {
                 item.selected = false
             })
         },
-        setSeat: function (){
+        setSeatTable: function (){
             var seatProps = this.seatSet.seat;
             //设置座位
             var arr = []; //座位号序列
@@ -248,6 +283,17 @@ export default {
                     item[key] = seatProps[key];
                 } 
                 item.colNum = arr[index];              
+            })
+        },
+        setSeatTicketStatus: function (){
+            this.selectedList.forEach((item,index)=>{                
+               item.ticketStatus = this.seatSet.ticketStatus   
+            })
+        },
+        setSeatOriginPrice: function (){
+            //设置票面
+            this.selectedList.forEach((item,index)=>{                
+               item.originPrice = this.seatSet.originPrice   
             })
         }
         
@@ -331,6 +377,7 @@ export default {
             height: 800px;
             background-color: #F6E3E2;
             text-align: left;
+            padding-left:20px;
             .row {
                 display: flex;
                 margin-top: 5px;
