@@ -64,11 +64,10 @@
                                     {{ option.name }}
                                 </option>
                             </select>                     
-                        </div>
+                        </div>                        
                     </section>                                   
                     <div class="btn-group">
                         <button @click="setSeatTable()">确定</button>
-                        <button @click="cancelSelected()">取消全选</button>
                     </div>
                 </div>
                 <div class="seat-config">
@@ -108,7 +107,6 @@
                     </section>                                     
                     <div class="btn-group">
                         <button @click="setSeatOriginPrice()">确定</button>
-                        <button @click="cancelSelected()">取消全选</button>
                     </div>
 
                 </div>                   
@@ -125,12 +123,10 @@
                         </div>
                     </section>                    
                     <div class="btn-group">
-                        <div style="display:block; max-height:150px; overflow:auto"><pre >{{seatSet}}</pre></div>
-                        
                         <button @click="setSeatTicketStatus()">确定</button>
-                        <button @click="cancelSelected()">取消全选</button>
                     </div>
                 </div>
+                <div style="display:block; max-height:150px; overflow:auto"><pre >{{seatSet}}</pre></div>
 
                 
 
@@ -399,6 +395,8 @@ export default {
             margin-top: 20px;
             .btn-group {
                 margin-top: 20px;
+                text-align: right;
+                padding-right: 20px
             }
         }
     }
