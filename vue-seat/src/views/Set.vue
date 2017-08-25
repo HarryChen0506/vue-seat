@@ -6,8 +6,9 @@
         <section class="main">
             <div class="left">
                 <h3>座位图</h3>
-                <div class="seat">
-                    <div class="seat-container" @click="cancelSelected()">
+                <div class="seat" id="seat-box" v-seat-box="{methods: show}" >
+                    <div class="seat-container"> 
+                            <!-- @click="cancelSelected()"-->
                          <div class="seat-row" v-for="(itemRow, indexRow) in seatList" v-bind:key="itemRow+'-row'">
                             <div class="seat-one"
                                  v-bind:class="{ checked: itemCol.selected}"
@@ -138,6 +139,9 @@
 <script>
 import Seat from '../components/Seat.vue';
 import * as Util from '../util/utiltool.js';
+import Vue from 'vue';
+import $ from 'jquery';
+
 
 export default {
     name: 'set',
@@ -228,6 +232,27 @@ export default {
         }
     },
     methods: {
+        show: function (){
+            // console.log(this.selectedList);
+            // console.log('组件回调', $('#seat-box'));
+            this.cancelSelected();
+            var $seatList = $('#seat-box').find("div.seat-one"); 
+            // var seatList = document.querySelectorAll('div.seat-one');
+            for(var i=0; i<$seatList.length; i++){
+                var item = $($seatList[i]);
+                if(item.hasClass('seled')){
+                     item.trigger('click');
+                }else{
+
+                }
+            }
+            // $seatList.forEach(function(item){
+            //     if($(item).hasClass('seled')){
+            //         $(item).trigger('click');
+            //     }
+            // })
+           
+        },
         resetRowCol: function(){
             this.initTable(this.row, this.col);
         },
@@ -259,7 +284,7 @@ export default {
         },
         selectSeat: function (seat){   //选中座位
             // console.log('选中的座位',seat)
-            seat.selected = !seat.selected;
+            seat.selected = true;
         },
         cancelSelected: function (){
             //取消选择
@@ -295,10 +320,137 @@ export default {
         
     }
 }
+
+Vue.directive('seatBox', {
+  bind: function (el, binding, vNode) {    
+  },
+  inserted: function (el, binding, vNode){
+    //  console.log('inserted')
+     var value = binding.value;     
+   
+    //鼠标下按事件  mouseDown 
+    $(el).on('mousedown', function(){  
+        console.log('mouseDown')
+        var $seatList = $(this).find("div.seat-one"); 
+        var evt = window.event || arguments[0];
+        //如果对象不是选座盒子，则ruturn        
+        var startX = (evt.x || evt.clientX); 
+        var startY = (evt.y || evt.clientY); 
+        var $selDiv = $("<div></div>");
+        $selDiv.css({
+            position:'absolute',
+            width: '0px',
+            height: '0px',
+            fontSize: '0px',
+            margin: '0px',
+            padding: '0px',
+            border: '1px dashed #0099FF',
+            backgroundColor: '#C3D5ED',
+            zIndex: '1000',
+            filter: 'alpha(opacity:60)',
+            opacity: 0.6,
+            display: 'none'
+        });
+        $selDiv.attr('id','selectDiv');
+        $selDiv.attr('class','selectDiv');
+        $selDiv.css({
+            left: startX + "px",
+            top: startY + "px"
+        })        
+        $selDiv.appendTo($('body'));
+        var isSelect = true;  //是否有选择框
+
+        var _x = null; 
+        var _y = null;
+        // evt.stopPropagation();  
+
+        $(el).on('mousemove',function(){
+            // console.log('move')
+            evt = window.event || arguments[0];
+            if (isSelect) {
+                if($selDiv.css('display') == "none") { 
+                    $selDiv.css('display',''); 
+                } 
+                _x = (evt.x || evt.clientX); 
+                _y = (evt.y || evt.clientY);
+                $selDiv.css('left', Math.min(_x, startX) + "px");
+                $selDiv.css('top',  Math.min(_y, startY) + "px");
+                $selDiv.css('width',  Math.abs(_x - startX-10) + "px");
+                $selDiv.css('height',  Math.abs(_y - startY-10) + "px");
+
+                var _l =  $selDiv.offset().left;   //选择盒子距离页面左边的距离
+                var _t =  $selDiv.offset().top;     //选择盒子距离页面顶部的距离
+                var _w = $selDiv.width();          //选择盒子宽度
+                var _h = $selDiv.height();         //选择盒子高度
+                // console.log('-l',_l)
+                // console.log('_t',_t)
+                for(var i=0; i<$seatList.length; i++){
+                    var sl = $($seatList[i]).width() + $($seatList[i]).offset().left;   //元素最右边的坐标
+                    var st = $($seatList[i]).height() + $($seatList[i]).offset().top;   //元素最下面的坐标
+
+                    if ( sl > _l && 
+                        st > _t && 
+                        $($seatList[i]).offset().left < _l + _w &&
+                        $($seatList[i]).offset().top < _t + _h ) { 
+                        if (!$($seatList[i]).hasClass("seled")) { 
+                            $($seatList[i]).addClass("seled")
+                        }
+                    } else { 
+                        if ($($seatList[i]).hasClass("seled")) { 
+                          $($seatList[i]).removeClass("seled")
+                        } 
+                    } 
+                }
+            }  
+        }) 
+        // 右键取消所选
+        $(el).on("contextmenu", function(){
+            // console.log('鼠标右键')            
+            var $seatList = $(this).find("div.seat-one"); 
+            for(var i=0; i<$seatList.length; i++){                  
+                 $($seatList[i]).removeClass("seled")                    
+            }
+             //触发回调            
+            value.methods() 
+            $seatList = null, _x = null, _y = null, $selDiv = null, startX = null, startY = null, evt = null; 
+        })
+        $('body').on('mouseup',function (){
+            console.log('mouseup')
+            isSelect = false; 
+            if($selDiv) { 
+                $selDiv.remove();
+                // $('.selectDiv').remove();
+            }
+            if(true){
+                console.log(evt);
+            } 
+            
+            //触发回调            
+            value.methods() 
+            $seatList = null, _x = null, _y = null, $selDiv = null, startX = null, startY = null, evt = null;  
+            $('body').unbind(); 
+        })
+    })
+
+
+  },
+  update: function (el, binding, vNode) {
+    //   console.log('update')
+
+  }
+})
+
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss">
+    body {
+        -moz-user-select: none;  
+        -webkit-user-select: none;  
+        -ms-user-select: none;  
+        -khtml-user-select: none;  
+        user-select: none;
+    }
     h1,
     h2,
     h3,
@@ -361,6 +513,9 @@ export default {
                             margin: 5px;
                             &.checked {
                                 border: 1px solid #000
+                            }
+                            &.seled {
+                                 border: 1px solid red
                             }
                         }
                     }
